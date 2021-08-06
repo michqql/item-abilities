@@ -1,0 +1,12 @@
+{
+  "item_id": "grapple",
+  "item": {
+    "name": "&6Grappling Hook",
+    "material": "FISHING_ROD",
+    "lore": [
+      "&eRight-Click &7to cast and reel your grapple",
+      "",
+      "&7Uses: &e100"
+    ]
+  }
+}

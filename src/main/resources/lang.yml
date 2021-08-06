@@ -1,0 +1,28 @@
+requires-player:
+  - '&4You must be a player to use this!'
+
+# %permission% - the required permission
+no-permission:
+  - '&4You do not have permission to use this!'
+
+player-offline:
+  - '&f%player% &cis not online'
+
+incomplete-command:
+  - '&cUsage: /%command%'
+
+# %item.id%
+item-not-found:
+  - '&cItem with id &f%id%&c could not be found'
+
+# %command% - the command label used
+admin-command-help:
+  - '&a<> &2&lItemAbility &a<>'
+  - ' &a/%command% give <item_id> [amount] [player_name]'
+
+# %item.id%, %item.name%, %amount%, %sender%, %receiver%
+give-item:
+  admin:
+    - '&aGave %amount%x %item.name% to %receiver%'
+  player:
+    - '&aYou have been given %amount% %item.name% by %sender%'

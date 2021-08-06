@@ -1,0 +1,8 @@
+name: ItemAbilities
+version: ${project.version}
+main: me.michqql.itemabilities.ItemAbilitiesPlugin
+api-version: 1.16
+
+commands:
+  item_ability:
+    aliases: ['itemAbility', 'ia']
