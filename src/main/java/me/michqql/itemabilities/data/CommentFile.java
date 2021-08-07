@@ -11,13 +11,13 @@ import java.util.logging.Level;
 
 public class CommentFile extends YamlFile {
 
-    public CommentFile(Plugin plugin, String path) {
+    public CommentFile(Plugin plugin, Path path) {
         super(plugin, path);
     }
 
     @Override
     protected void copy(Plugin plugin) {
-        InputStream in = plugin.getResource(path);
+        InputStream in = plugin.getResource(path.getPath());
         if(in == null) {
             Bukkit.getLogger().log(Level.WARNING, "Could not find resource to copy named " + path);
             return;

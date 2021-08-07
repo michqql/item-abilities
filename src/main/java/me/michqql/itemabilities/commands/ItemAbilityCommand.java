@@ -1,6 +1,7 @@
 package me.michqql.itemabilities.commands;
 
 import me.michqql.itemabilities.ItemAbilitiesPlugin;
+import me.michqql.itemabilities.data.DataFile;
 import me.michqql.itemabilities.data.JsonFile;
 import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.util.CommandUtil;
@@ -77,7 +78,7 @@ public class ItemAbilityCommand implements CommandExecutor {
 
             ItemStack item;
             try {
-                item = ItemGenerator.generateItem(plugin, new JsonFile(plugin, "" + itemId + ".json"));
+                item = ItemGenerator.generateItem(plugin, new JsonFile(plugin, new DataFile.Path("items", itemId, "json")));
             } catch(IllegalArgumentException e) {
                 msg.sendList(player, "item-not-found", new HashMap<String, String>(){{
                     put("id", itemId);

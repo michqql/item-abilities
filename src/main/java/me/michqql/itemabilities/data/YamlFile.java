@@ -12,8 +12,8 @@ public class YamlFile extends DataFile {
 
     private FileConfiguration config;
 
-    public YamlFile(Plugin plugin, String path) {
-        super(plugin, path.endsWith(".yml") ? path : path + ".yml");
+    public YamlFile(Plugin plugin, Path path) {
+        super(plugin, path.setExtension("yml"));
     }
 
     public FileConfiguration getConfig() {

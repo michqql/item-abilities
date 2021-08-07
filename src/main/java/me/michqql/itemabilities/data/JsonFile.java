@@ -10,15 +10,16 @@ import java.util.logging.Level;
 public class JsonFile extends DataFile {
 
     private final static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private final static JsonParser PARSER = new JsonParser();
     private JsonElement element;
 
-    public JsonFile(Plugin plugin, String path) {
-        super(plugin, path.endsWith(".json") ? path : path + ".json");
+    public JsonFile(Plugin plugin, Path path) {
+        super(plugin, path.setExtension("json"));
     }
 
     @Override
     protected void copy(Plugin plugin) {
-        InputStream in = plugin.getResource(path);
+        InputStream in = plugin.getResource(path.getPath());
         if(in == null) {
             Bukkit.getLogger().log(Level.WARNING, "Could not find resource to copy named " + path);
             return;
@@ -43,7 +44,7 @@ public class JsonFile extends DataFile {
     @Override
     protected void init() {
         try {
-            this.element = JsonParser.parseReader(new FileReader(this.file));
+            this.element = PARSER.parse(new FileReader(this.file));
         } catch (FileNotFoundException e) {
             Bukkit.getLogger().log(Level.SEVERE, "Could not read json file named " + path);
             e.printStackTrace();
