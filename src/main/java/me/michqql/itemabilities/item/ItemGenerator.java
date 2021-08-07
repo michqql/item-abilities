@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.michqql.itemabilities.ItemAbilitiesPlugin;
+import me.michqql.itemabilities.data.DataFile;
 import me.michqql.itemabilities.data.JsonFile;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemGenerator {
+
+    public static ItemStack generateItem(final ItemAbilitiesPlugin plugin, final String itemId) {
+        return generateItem(plugin, new JsonFile(plugin, new DataFile.Path("items", itemId, "json")));
+    }
 
     public static ItemStack generateItem(final ItemAbilitiesPlugin plugin, final JsonFile file) {
         JsonObject json = file.getJsonObject();

@@ -9,8 +9,8 @@ import java.util.logging.Level;
 
 public class JsonFile extends DataFile {
 
-    private final static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final static JsonParser PARSER = new JsonParser();
+    public final static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public final static JsonParser PARSER = new JsonParser();
     private JsonElement element;
 
     public JsonFile(Plugin plugin, Path path) {

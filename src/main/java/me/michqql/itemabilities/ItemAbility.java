@@ -19,7 +19,7 @@ public abstract class ItemAbility implements Listener {
         this.jsonFile = new JsonFile(plugin, new DataFile.Path("items", identifier, "json"));
         this.identifier = identifier;
 
-        ItemAbilityManager.registerAbility(this);
+        ItemAbilityHandler.registerAbility(this);
     }
 
     public String getIdentifier() {

@@ -8,6 +8,9 @@ no-permission:
 player-offline:
   - '&f%player% &cis not online'
 
+player-not-found:
+  - '&cCould not find player named %player%'
+
 incomplete-command:
   - '&cUsage: /%command%'
 
@@ -15,14 +18,32 @@ incomplete-command:
 item-not-found:
   - '&cItem with id &f%id%&c could not be found'
 
+command-help:
+  - '&a<> &2Item Abilities &a<>'
+  - ' &a/%command% reclaim &fAttempts to reclaim items'
+
 # %command% - the command label used
 admin-command-help:
-  - '&a<> &2&lItemAbility &a<>'
-  - ' &a/%command% give <item_id> [amount] [player_name]'
+  - '&c<> &4Admin Commands &c<>'
+  - ' &c/%command% give <item_id> [amount] [player_name]'
 
 # %item.id%, %item.name%, %amount%, %sender%, %receiver%
 give-item:
   admin:
-    - '&aGave %amount%x %item.name% to %receiver%'
+    - '&aGave %amount%x %item.id% to %receiver%'
+  admin-offline:
+    - '&f%receiver%&c is offline!'
+    - '&a%amount%x %item.id% has been added to their reclaim'
   player:
     - '&aYou have been given %amount% %item.name% by %sender%'
+  player-reclaim:
+    - '&aYou have been given %amount% %item.name% by %sender%'
+    - '&eYou did not have space in your inventory,'
+    - '&eso these items have been sent to your reclaim'
+    - '&etype &f/item_ability reclaim &eto reclaim these!'
+
+# %amount.reclaimed%, %amount.remain%, %plural.reclaimed%, %plural.remain%
+reclaim:
+  - '&2Item Ability Reclaim'
+  - '&aYou reclaimed %amount.reclaimed%x item%plural.reclaimed%'
+  - '&eYou have %amount.remain%x item%plural.remain% left to reclaim!'

@@ -22,4 +22,9 @@ public class ItemCompare {
         final String idOnItem = data.get(key, PersistentDataType.STRING);
         return itemId.equals(idOnItem);
     }
+
+    public static String getItemName(final ItemStack itemStack) {
+        ItemMeta meta = itemStack.getItemMeta();
+        return meta != null && meta.hasDisplayName() ? meta.getDisplayName() : itemStack.getType().toString();
+    }
 }

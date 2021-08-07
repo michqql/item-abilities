@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-public class ItemAbilityManager {
+public class ItemAbilityHandler {
 
     private static final HashMap<String, ItemAbility> ITEM_ABILITIES = new HashMap<>();
 

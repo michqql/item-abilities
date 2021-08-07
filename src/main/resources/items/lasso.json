@@ -1,0 +1,10 @@
+{
+  "item_id": "lasso",
+  "item": {
+    "name": "&6Lasso",
+    "material": "FISHING_ROD",
+    "lore": [
+      "&eRight-Click &7to cast and reel your lasso"
+    ]
+  }
+}

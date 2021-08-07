@@ -4,6 +4,7 @@ import me.michqql.itemabilities.ability.GrappleAbility;
 import me.michqql.itemabilities.commands.ItemAbilityCommand;
 import me.michqql.itemabilities.data.CommentFile;
 import me.michqql.itemabilities.data.DataFile;
+import me.michqql.itemabilities.item.reclaim.ReclaimHandler;
 import me.michqql.itemabilities.util.MessageUtil;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,14 +12,17 @@ import java.util.Objects;
 
 public final class ItemAbilitiesPlugin extends JavaPlugin {
 
+    private ReclaimHandler reclaimHandler;
+
     @Override
     public void onEnable() {
+        reclaimHandler = new ReclaimHandler(this);
         final MessageUtil messageUtil = new MessageUtil(new CommentFile(this, new DataFile.Path("", "lang", "yml")));
 
         registerAbilities();
 
         // Commands
-        Objects.requireNonNull(getCommand("item_ability")).setExecutor(new ItemAbilityCommand(this, messageUtil));
+        Objects.requireNonNull(getCommand("item_ability")).setExecutor(new ItemAbilityCommand(this, messageUtil, reclaimHandler));
     }
 
     @Override
