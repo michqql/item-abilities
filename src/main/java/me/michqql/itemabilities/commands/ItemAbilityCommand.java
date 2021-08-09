@@ -1,7 +1,7 @@
 package me.michqql.itemabilities.commands;
 
 import me.michqql.itemabilities.ItemAbilitiesPlugin;
-import me.michqql.itemabilities.item.ItemCompare;
+import me.michqql.itemabilities.item.ItemModifier;
 import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.item.reclaim.ReclaimHandler;
 import me.michqql.itemabilities.util.CommandUtil;
@@ -98,7 +98,7 @@ public class ItemAbilityCommand implements CommandExecutor {
                 reclaimHandler.giveItem(uuid, itemId, amount);
                 msg.sendList(player, "give-item.admin-offline", new HashMap<String, String>(){{
                     put("item.id", itemId);
-                    put("item.name", ItemCompare.getItemName(item));
+                    put("item.name", ItemModifier.getItemName(item));
                     put("amount", String.valueOf(amount));
                     put("sender", player.getName());
                     put("receiver", name);
@@ -117,19 +117,20 @@ public class ItemAbilityCommand implements CommandExecutor {
             final Player finalTarget = target;
             HashMap<String, String> placeholders = new HashMap<String, String>(){{
                 put("item.id", itemId);
-                put("item.name", ItemCompare.getItemName(item));
+                put("item.name", ItemModifier.getItemName(item));
                 put("amount", String.valueOf(amount));
                 put("sender", player.getName());
                 put("receiver", finalTarget.getName());
             }};
 
-            msg.sendList(player, "give-item.admin", placeholders);
-            if(!player.equals(target)) {
-                if(sentToReclaim)
-                    msg.sendList(target, "give-item.player-reclaim", placeholders);
-                else
-                    msg.sendList(target, "give-item.player", placeholders);
-            }
+
+            if(!player.equals(target))
+                msg.sendList(player, "give-item.admin", placeholders);
+
+            if(sentToReclaim)
+                msg.sendList(target, "give-item.player-reclaim", placeholders);
+            else
+                msg.sendList(target, "give-item.player", placeholders);
         }
 
         // Player commands

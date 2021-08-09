@@ -2,10 +2,19 @@ package me.michqql.itemabilities.ability;
 
 import me.michqql.itemabilities.ItemAbilitiesPlugin;
 import me.michqql.itemabilities.ItemAbility;
+import me.michqql.itemabilities.item.ItemGenerator;
+import me.michqql.itemabilities.item.ItemModifier;
+import me.michqql.itemabilities.util.Pair;
 import org.bukkit.Location;
+import org.bukkit.entity.FishHook;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 public class GrappleAbility extends ItemAbility {
 
@@ -16,7 +25,8 @@ public class GrappleAbility extends ItemAbility {
     @EventHandler
     public void onFishingRodCast(PlayerFishEvent e) {
         // Player must be holding correct item in hand
-        if(!isPlayerHoldingCorrectItem(e.getPlayer(), false))
+        Pair<Boolean, ItemStack> item = isPlayerHoldingCorrectItem(e.getPlayer(), false);
+        if(!item.key)
             return;
 
         // Do not care about this state, only reel in states
@@ -29,6 +39,9 @@ public class GrappleAbility extends ItemAbility {
             e.setCancelled(true);
             return;
         }
+
+        ItemModifier.getAndSetPropertyValue(plugin, item.value, "uses", (value) -> --value);
+        ItemGenerator.updateItem(plugin, item.value);
 
         Location hook = e.getHook().getLocation().clone();
         //hook.setY(inverseLerp(0, 255, hook.getY()) - 1); // trying to normalize y-value

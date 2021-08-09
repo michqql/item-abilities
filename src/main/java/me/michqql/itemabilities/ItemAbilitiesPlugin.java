@@ -1,6 +1,7 @@
 package me.michqql.itemabilities;
 
 import me.michqql.itemabilities.ability.GrappleAbility;
+import me.michqql.itemabilities.ability.TreeFallerAbility;
 import me.michqql.itemabilities.commands.ItemAbilityCommand;
 import me.michqql.itemabilities.data.CommentFile;
 import me.michqql.itemabilities.data.DataFile;
@@ -12,11 +13,9 @@ import java.util.Objects;
 
 public final class ItemAbilitiesPlugin extends JavaPlugin {
 
-    private ReclaimHandler reclaimHandler;
-
     @Override
     public void onEnable() {
-        reclaimHandler = new ReclaimHandler(this);
+        final ReclaimHandler reclaimHandler = new ReclaimHandler(this);
         final MessageUtil messageUtil = new MessageUtil(new CommentFile(this, new DataFile.Path("", "lang", "yml")));
 
         registerAbilities();
@@ -32,5 +31,6 @@ public final class ItemAbilitiesPlugin extends JavaPlugin {
 
     private void registerAbilities() {
         new GrappleAbility(this);
+        new TreeFallerAbility(this);
     }
 }

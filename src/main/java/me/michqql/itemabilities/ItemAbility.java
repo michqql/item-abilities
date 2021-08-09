@@ -2,7 +2,8 @@ package me.michqql.itemabilities;
 
 import me.michqql.itemabilities.data.DataFile;
 import me.michqql.itemabilities.data.JsonFile;
-import me.michqql.itemabilities.item.ItemCompare;
+import me.michqql.itemabilities.item.ItemModifier;
+import me.michqql.itemabilities.util.Pair;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.EntityEquipment;
@@ -27,15 +28,20 @@ public abstract class ItemAbility implements Listener {
     }
 
     protected boolean isCorrectItem(ItemStack itemStack) {
-        return ItemCompare.isItemOfType(plugin, itemStack, identifier);
+        return ItemModifier.isItemOfType(plugin, itemStack, identifier);
     }
 
-    protected boolean isPlayerHoldingCorrectItem(Player player, boolean mainHandOnly) {
+    protected Pair<Boolean, ItemStack> isPlayerHoldingCorrectItem(Player player, boolean mainHandOnly) {
         EntityEquipment equipment = player.getEquipment();
         if(equipment == null)
-            return false;
+            return new Pair<>(false, null);
 
-        boolean heldInMainHand = ItemCompare.isItemOfType(plugin, equipment.getItemInMainHand(), identifier);
-        return mainHandOnly ? heldInMainHand : (heldInMainHand || ItemCompare.isItemOfType(plugin, equipment.getItemInOffHand(), identifier));
+        boolean heldInMainHand = ItemModifier.isItemOfType(plugin, equipment.getItemInMainHand(), identifier);
+        if(mainHandOnly || heldInMainHand) {
+            return new Pair<>(heldInMainHand, equipment.getItemInMainHand());
+        } else {
+            boolean heldInOffHand = ItemModifier.isItemOfType(plugin, equipment.getItemInOffHand(), identifier);
+            return new Pair<>(heldInOffHand, equipment.getItemInOffHand());
+        }
     }
 }

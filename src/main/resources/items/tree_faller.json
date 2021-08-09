@@ -1,5 +1,5 @@
 {
-  "item_id": "grapple",
+  "item_id": "tree_faller",
   "properties": [
     {
       "tag": "uses",
@@ -7,10 +7,10 @@
     }
   ],
   "item": {
-    "name": "&6Grappling Hook",
-    "material": "FISHING_ROD",
+    "name": "&6Tree Faller",
+    "material": "IRON_AXE",
     "lore": [
-      "&eRight-Click &7to cast and reel your grapple",
+      "&eChop Trees &7to mine them instantly!",
       "&7Uses remaining: &f%uses%"
     ]
   }

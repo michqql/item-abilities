@@ -94,6 +94,24 @@ public class MessageUtil {
         return format(string);
     }
 
+    public static List<String> replacePlaceholders(List<String> list, Map<String, String> placeholders) {
+        if(placeholders == null || placeholders.isEmpty())
+            return format(list);
+
+        List<String> newList = new ArrayList<>();
+        for(String line : list) {
+            Matcher match = PLACEHOLDER_PATTERN.matcher(line);
+            while (match.find()) {
+                String placeholder = line.substring(match.start(), match.end());
+                String placeholderInner = line.substring(match.start() + 1, match.end() - 1);
+                line = line.replace(placeholder, placeholders.getOrDefault(placeholderInner, ""));
+                match = PLACEHOLDER_PATTERN.matcher(line);
+            }
+            newList.add(line);
+        }
+        return format(newList);
+    }
+
     public String getMessage(String path) {
         if(lang == null || lang.getString(path) == null)
             return "";
