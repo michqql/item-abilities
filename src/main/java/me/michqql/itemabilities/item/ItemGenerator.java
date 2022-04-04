@@ -3,10 +3,9 @@ package me.michqql.itemabilities.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import me.michqql.core.io.JsonFile;
+import me.michqql.core.util.MessageHandler;
 import me.michqql.itemabilities.ItemAbilitiesPlugin;
-import me.michqql.itemabilities.data.DataFile;
-import me.michqql.itemabilities.data.JsonFile;
-import me.michqql.itemabilities.util.MessageUtil;
 import me.michqql.itemabilities.util.Tuple;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,14 +22,17 @@ import java.util.List;
 public class ItemGenerator {
 
     public static ItemStack generateItem(final ItemAbilitiesPlugin plugin, final String itemId) {
-        return generateItem(plugin, new JsonFile(plugin, new DataFile.Path("items", itemId, "json")));
+        return generateItem(plugin, new JsonFile(plugin, "items", itemId));
     }
 
     public static ItemStack generateItem(final ItemAbilitiesPlugin plugin, final JsonFile file) {
-        JsonObject json = file.getJsonObject();
-        if(json == null || json.isJsonNull()) {
-            throw new IllegalArgumentException("Could not find json file named " + file.getPath());
+        JsonElement element = file.getJsonElement();
+        if(!element.isJsonObject()) {
+            throw new IllegalArgumentException("Could not read json file");
         }
+
+        JsonObject json = element.getAsJsonObject();
+
         // Contains 3 properties - item_id (string), properties (array of objects), item (object)
         String id = json.get("item_id").getAsString();
         JsonArray properties = json.getAsJsonArray("properties");
@@ -47,11 +49,11 @@ public class ItemGenerator {
 
             // Props
             HashMap<String, String> propertyPlaceholders = new HashMap<>();
-            for(JsonElement element : properties) {
-                if(!element.isJsonObject())
+            for(JsonElement arrayElement : properties) {
+                if(!arrayElement.isJsonObject())
                     continue;
 
-                JsonObject object = element.getAsJsonObject();
+                JsonObject object = arrayElement.getAsJsonObject();
                 String tag = object.get("tag").getAsString();
                 int value = object.get("value").getAsInt();
 
@@ -59,8 +61,8 @@ public class ItemGenerator {
                 data.set(new NamespacedKey(plugin, "iap-" + tag), PersistentDataType.INTEGER, value);
             }
 
-            meta.setDisplayName(MessageUtil.format(itemData.b));
-            meta.setLore(MessageUtil.replacePlaceholders(itemData.c, propertyPlaceholders));
+            meta.setDisplayName(MessageHandler.colour(itemData.b));
+            meta.setLore(MessageHandler.replacePlaceholdersStatic(itemData.c, propertyPlaceholders));
             itemStack.setItemMeta(meta);
         }
 
@@ -68,20 +70,16 @@ public class ItemGenerator {
     }
 
     public static void updateItem(final ItemAbilitiesPlugin plugin, final ItemStack toUpdate) {
-        updateItem(
-                new JsonFile(
-                        plugin,
-                        new DataFile.Path("items", ItemModifier.getIdOnItem(plugin, toUpdate), "json")
-                ),
-                toUpdate
-        );
+        updateItem(new JsonFile(plugin, "items", ItemModifier.getIdOnItem(plugin, toUpdate)), toUpdate);
     }
 
     public static void updateItem(final JsonFile file, final ItemStack toUpdate) {
-        JsonObject json = file.getJsonObject();
-        if(json == null || json.isJsonNull()) {
-            throw new IllegalArgumentException("Could not find json file named " + file.getPath());
+        JsonElement element = file.getJsonElement();
+        if(!element.isJsonObject()) {
+            throw new IllegalArgumentException("Could not read json file");
         }
+
+        JsonObject json = element.getAsJsonObject();
 
         JsonObject item = json.getAsJsonObject("item");
         Tuple<Material, String, List<String>> itemData = readItemObject(item);
@@ -102,8 +100,8 @@ public class ItemGenerator {
                 propertyPlaceholders.put(tag, String.valueOf(value));
             }
 
-            meta.setDisplayName(MessageUtil.format(itemData.b));
-            meta.setLore(MessageUtil.replacePlaceholders(itemData.c, propertyPlaceholders));
+            meta.setDisplayName(MessageHandler.colour(itemData.b));
+            meta.setLore(MessageHandler.replacePlaceholdersStatic(itemData.c, propertyPlaceholders));
             toUpdate.setItemMeta(meta);
         }
     }

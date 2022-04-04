@@ -1,18 +1,19 @@
 package me.michqql.itemabilities.commands;
 
+import me.michqql.core.util.MessageHandler;
+import me.michqql.core.util.OfflineUUID;
 import me.michqql.itemabilities.ItemAbilitiesPlugin;
 import me.michqql.itemabilities.item.ItemModifier;
 import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.item.reclaim.ReclaimHandler;
 import me.michqql.itemabilities.util.CommandUtil;
-import me.michqql.itemabilities.util.MessageUtil;
-import me.michqql.itemabilities.util.NameToUUIDConverter;
 import me.michqql.itemabilities.util.Perm;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,20 +22,20 @@ import java.util.UUID;
 public class ItemAbilityCommand implements CommandExecutor {
 
     private final ItemAbilitiesPlugin plugin;
-    private final MessageUtil msg;
+    private final MessageHandler messageHandler;
 
     private final ReclaimHandler reclaimHandler;
 
-    public ItemAbilityCommand(ItemAbilitiesPlugin plugin, MessageUtil msg, ReclaimHandler reclaimHandler) {
+    public ItemAbilityCommand(ItemAbilitiesPlugin plugin, MessageHandler messageHandler, ReclaimHandler reclaimHandler) {
         this.plugin = plugin;
-        this.msg = msg;
+        this.messageHandler = messageHandler;
         this.reclaimHandler = reclaimHandler;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] fullArguments) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] fullArguments) {
         if(!(sender instanceof Player)) {
-            msg.sendList(sender, "requires-player");
+            messageHandler.sendList(sender, "requires-player");
             return true;
         }
 
@@ -43,9 +44,9 @@ public class ItemAbilityCommand implements CommandExecutor {
 
         if(fullArguments.length == 0) {
             HashMap<String, String> placeholders = new HashMap<String, String>(){{ put("command", label); }};
-            msg.sendList(player, "command-help", placeholders);
+            messageHandler.sendList(player, "command-help", placeholders);
             if(isAdmin)
-                msg.sendList(player, "admin-command-help", placeholders);
+                messageHandler.sendList(player, "admin-command-help", placeholders);
             return true;
         }
 
@@ -54,14 +55,14 @@ public class ItemAbilityCommand implements CommandExecutor {
         // Admin commands
         if(subCommand.equalsIgnoreCase("give")) {
             if(!isAdmin) {
-                msg.sendList(sender, "no-permission", new HashMap<String, String>(){{
+                messageHandler.sendList(sender, "no-permission", new HashMap<String, String>(){{
                     put("permission", Perm.ADMIN);
                 }});
                 return true;
             }
 
             if(args.length < 1) {
-                msg.sendList(player, "incomplete-command", new HashMap<String, String>(){{
+                messageHandler.sendList(player, "incomplete-command", new HashMap<String, String>(){{
                     put("command", label + " give <item_id> [amount] [player_name]");
                 }});
                 return true;
@@ -75,7 +76,7 @@ public class ItemAbilityCommand implements CommandExecutor {
             try {
                 item = ItemGenerator.generateItem(plugin, itemId);
             } catch(IllegalArgumentException e) {
-                msg.sendList(player, "item-not-found", new HashMap<String, String>(){{
+                messageHandler.sendList(player, "item-not-found", new HashMap<String, String>(){{
                     put("id", itemId);
                 }});
                 return true;
@@ -87,16 +88,16 @@ public class ItemAbilityCommand implements CommandExecutor {
             } else if (target == null) {
                 // Add item to reclaim
                 String name = args[2];
-                UUID uuid = NameToUUIDConverter.getUUIDFromName(name);
+                UUID uuid = OfflineUUID.getUUID(name);
                 if(uuid == null) {
-                    msg.sendList(player, "player-not-found", new HashMap<String, String>(){{
+                    messageHandler.sendList(player, "player-not-found", new HashMap<String, String>(){{
                         put("player", name);
                     }});
                     return true;
                 }
 
                 reclaimHandler.giveItem(uuid, itemId, amount);
-                msg.sendList(player, "give-item.admin-offline", new HashMap<String, String>(){{
+                messageHandler.sendList(player, "give-item.admin-offline", new HashMap<String, String>(){{
                     put("item.id", itemId);
                     put("item.name", ItemModifier.getItemName(item));
                     put("amount", String.valueOf(amount));
@@ -125,19 +126,19 @@ public class ItemAbilityCommand implements CommandExecutor {
 
 
             if(!player.equals(target))
-                msg.sendList(player, "give-item.admin", placeholders);
+                messageHandler.sendList(player, "give-item.admin", placeholders);
 
             if(sentToReclaim)
-                msg.sendList(target, "give-item.player-reclaim", placeholders);
+                messageHandler.sendList(target, "give-item.player-reclaim", placeholders);
             else
-                msg.sendList(target, "give-item.player", placeholders);
+                messageHandler.sendList(target, "give-item.player", placeholders);
         }
 
         // Player commands
         if(subCommand.equalsIgnoreCase("reclaim")) {
             int[] amounts = reclaimHandler.reclaimItems(player);
 
-            msg.sendList(player, "reclaim", new HashMap<String, String>(){{
+            messageHandler.sendList(player, "reclaim", new HashMap<String, String>(){{
                 put("amount.reclaimed", String.valueOf(amounts[0]));
                 put("amount.remain", String.valueOf(amounts[1]));
                 put("plural.reclaimed", (amounts[0] != 1 ? "s" : ""));

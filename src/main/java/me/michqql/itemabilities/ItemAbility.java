@@ -1,7 +1,6 @@
 package me.michqql.itemabilities;
 
-import me.michqql.itemabilities.data.DataFile;
-import me.michqql.itemabilities.data.JsonFile;
+import me.michqql.core.io.JsonFile;
 import me.michqql.itemabilities.item.ItemModifier;
 import me.michqql.itemabilities.util.Pair;
 import org.bukkit.entity.Player;
@@ -17,7 +16,7 @@ public abstract class ItemAbility implements Listener {
 
     public ItemAbility(ItemAbilitiesPlugin plugin, String identifier) {
         this.plugin = plugin;
-        this.jsonFile = new JsonFile(plugin, new DataFile.Path("items", identifier, "json"));
+        this.jsonFile = new JsonFile(plugin, "items", identifier);
         this.identifier = identifier;
 
         ItemAbilityHandler.registerAbility(this);

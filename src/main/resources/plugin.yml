@@ -1,7 +1,7 @@
 name: ItemAbilities
 version: ${project.version}
 main: me.michqql.itemabilities.ItemAbilitiesPlugin
-api-version: 1.16
+api-version: 1.18
 
 commands:
   item_ability:

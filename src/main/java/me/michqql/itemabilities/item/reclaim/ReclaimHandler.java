@@ -1,8 +1,7 @@
 package me.michqql.itemabilities.item.reclaim;
 
+import me.michqql.core.io.YamlFile;
 import me.michqql.itemabilities.ItemAbilitiesPlugin;
-import me.michqql.itemabilities.data.DataFile;
-import me.michqql.itemabilities.data.YamlFile;
 import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.util.Pair;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,21 +20,21 @@ public class ReclaimHandler {
     }
 
     public void giveItem(UUID uuid, String itemId, int amount) {
-            YamlFile yaml = new YamlFile(plugin, new DataFile.Path("reclaim", uuid.toString(), "yml"));
-            FileConfiguration f = yaml.getConfig();
+            YamlFile yamlFile = new YamlFile(plugin, "reclaim", uuid.toString());
+            FileConfiguration f = yamlFile.getConfig();
             int savedAmount = f.getInt(itemId, 0);
-            yaml.getConfig().set(itemId, amount + savedAmount);
-            yaml.save();
+            yamlFile.getConfig().set(itemId, amount + savedAmount);
+            yamlFile.save();
     }
 
     public Pair<String, Integer> getNextItem(UUID uuid) {
-        YamlFile yaml = new YamlFile(plugin, new DataFile.Path("reclaim", uuid.toString(), "yml"));
-        FileConfiguration f = yaml.getConfig();
+        YamlFile yamlFile = new YamlFile(plugin, "reclaim", uuid.toString());
+        FileConfiguration f = yamlFile.getConfig();
         for(String itemId : f.getKeys(false)) {
             int amount = f.getInt(itemId, 0);
             if (amount > 0) {
                 f.set(itemId, null);
-                yaml.save();
+                yamlFile.save();
                 return new Pair<>(itemId, amount);
             }
         }
@@ -48,8 +47,8 @@ public class ReclaimHandler {
      * a[1] = remaining item amount
      */
     public int[] reclaimItems(Player player) {
-        YamlFile yaml = new YamlFile(plugin, new DataFile.Path("reclaim", player.getUniqueId().toString(), "yml"));
-        FileConfiguration f = yaml.getConfig();
+        YamlFile yamlFile = new YamlFile(plugin, "reclaim", player.getUniqueId().toString());
+        FileConfiguration f = yamlFile.getConfig();
         Set<String> itemIds = f.getKeys(false);
         Iterator<String> iterator = itemIds.iterator();
 
@@ -68,7 +67,7 @@ public class ReclaimHandler {
             }
         }
 
-        yaml.save();
+        yamlFile.save();
         return new int[] { reclaimed, f.getKeys(false).size() };
     }
 }

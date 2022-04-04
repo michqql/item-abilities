@@ -6,15 +6,10 @@ import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.item.ItemModifier;
 import me.michqql.itemabilities.util.Pair;
 import org.bukkit.Location;
-import org.bukkit.entity.FishHook;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.HashMap;
-import java.util.UUID;
 
 public class GrappleAbility extends ItemAbility {
 
