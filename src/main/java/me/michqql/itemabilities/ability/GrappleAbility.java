@@ -1,6 +1,6 @@
 package me.michqql.itemabilities.ability;
 
-import me.michqql.itemabilities.ItemAbilitiesPlugin;
+import me.michqql.itemabilities.ItemAbilityPlugin;
 import me.michqql.itemabilities.ItemAbility;
 import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.item.ItemModifier;
@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 
 public class GrappleAbility extends ItemAbility {
 
-    public GrappleAbility(ItemAbilitiesPlugin plugin) {
+    public GrappleAbility(ItemAbilityPlugin plugin) {
         super(plugin, "grapple");
     }
 
@@ -35,8 +35,16 @@ public class GrappleAbility extends ItemAbility {
             return;
         }
 
-        ItemModifier.getAndSetPropertyValue(plugin, item.value, "uses", (value) -> --value);
-        ItemGenerator.updateItem(plugin, item.value);
+        ItemModifier.getAndSetPropertyValue(item.value, "uses", (value) -> {
+            int remaining = value.intValue() - 1;
+            if(remaining <= 0) {
+                // break item
+                return null;
+            }
+            System.out.println("Remaining uses: " + remaining);
+            return remaining;
+        });
+        ItemGenerator.updateItem(item.value);
 
         Location hook = e.getHook().getLocation().clone();
         //hook.setY(inverseLerp(0, 255, hook.getY()) - 1); // trying to normalize y-value

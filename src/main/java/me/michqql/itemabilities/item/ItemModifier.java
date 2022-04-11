@@ -1,29 +1,35 @@
 package me.michqql.itemabilities.item;
 
-import me.michqql.itemabilities.ItemAbilitiesPlugin;
+import me.michqql.itemabilities.ItemAbilityPlugin;
+import me.michqql.itemabilities.item.data.NumberDataType;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 public class ItemModifier {
 
-    public static String getIdOnItem(final ItemAbilitiesPlugin plugin, final ItemStack itemStack) {
+    private final static ItemAbilityPlugin PLUGIN = ItemAbilityPlugin.getInstance();
+
+    public static String getIdOnItem(final ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();
         if(meta == null)
             return "";
 
         PersistentDataContainer data = meta.getPersistentDataContainer();
-        final NamespacedKey key = new NamespacedKey(plugin, "ia-item-id");
+        final NamespacedKey key = NKeyCache.getNKey(ItemGenerator.ITEM_ID_KEY);
         if(!data.has(key, PersistentDataType.STRING))
             return "";
 
         return data.get(key, PersistentDataType.STRING);
     }
 
-    public static boolean isItemOfType(final ItemAbilitiesPlugin plugin, final ItemStack itemStack, final String itemId) {
-        return itemId.equals(getIdOnItem(plugin, itemStack));
+    public static boolean isItemOfType(final ItemStack itemStack, final String itemId) {
+        return itemId.equals(getIdOnItem(itemStack));
     }
 
     public static String getItemName(final ItemStack itemStack) {
@@ -31,53 +37,49 @@ public class ItemModifier {
         return meta != null && meta.hasDisplayName() ? meta.getDisplayName() : itemStack.getType().toString();
     }
 
-    public static void setPropertyValue(final ItemAbilitiesPlugin plugin, final ItemStack itemStack, final String tag, final Integer value) {
+    public static void setPropertyValue(final ItemStack itemStack, final String tag, final Number value) {
         ItemMeta meta = itemStack.getItemMeta();
         if(meta == null)
             return;
 
         PersistentDataContainer data = meta.getPersistentDataContainer();
-        final NamespacedKey key = new NamespacedKey(plugin, "iap-" + tag);
-        data.set(key, PersistentDataType.INTEGER, value);
+        final NamespacedKey key = NKeyCache.getNKey(ItemGenerator.PROPERTY_ID_KEY + tag);
+        data.set(key, NumberDataType.NUMBER, value);
         itemStack.setItemMeta(meta);
     }
 
-    public static Integer getPropertyValue(final ItemAbilitiesPlugin plugin, final ItemStack itemStack, final String tag) {
+    public static Number getPropertyValue(final ItemStack itemStack, final String tag) {
         ItemMeta meta = itemStack.getItemMeta();
         if(meta == null)
             return -1;
 
         PersistentDataContainer data = meta.getPersistentDataContainer();
-        final NamespacedKey key = new NamespacedKey(plugin, "iap-" + tag);
-        if(!data.has(key, PersistentDataType.INTEGER))
+        final NamespacedKey key = NKeyCache.getNKey(ItemGenerator.PROPERTY_ID_KEY + tag);
+        if(!data.has(key, NumberDataType.NUMBER))
             return -1;
 
-        return data.get(key, PersistentDataType.INTEGER);
+        return data.get(key, NumberDataType.NUMBER);
     }
 
-    public static Integer getAndSetPropertyValue(final ItemAbilitiesPlugin plugin, final ItemStack itemStack,
-                                              final String tag, final GetPropertyResponse response) {
-
-        if(response == null)
-            return -1;
+    public static Number getAndSetPropertyValue(final ItemStack itemStack, final String tag,
+                                                 @NotNull Function<Number, Number> function) {
 
         ItemMeta meta = itemStack.getItemMeta();
         if(meta == null)
-            return -1;
+            return null;
 
         PersistentDataContainer data = meta.getPersistentDataContainer();
-        final NamespacedKey key = new NamespacedKey(plugin, "iap-" + tag);
-        if(!data.has(key, PersistentDataType.INTEGER))
-            return -1;
+        final NamespacedKey key = NKeyCache.getNKey(ItemGenerator.PROPERTY_ID_KEY + tag);
+        if(!data.has(key, NumberDataType.NUMBER))
+            return null;
 
-        Integer value = data.get(key, PersistentDataType.INTEGER);
-        Integer responseValue = response.handle(value);
-        data.set(key, PersistentDataType.INTEGER, responseValue);
+        Number value = data.get(key, NumberDataType.NUMBER);
+        value = function.apply(value);
+        if(value == null)
+            return null;
+
+        data.set(key, NumberDataType.NUMBER, value);
         itemStack.setItemMeta(meta);
-        return responseValue;
-    }
-
-    public interface GetPropertyResponse {
-        Integer handle(Integer value);
+        return value;
     }
 }

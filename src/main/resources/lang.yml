@@ -14,33 +14,42 @@ player-not-found:
 incomplete-command:
   - '&cUsage: /%command%'
 
+invalid-command:
+  - '&cCould not find command &f%command%'
+
 # %item.id%
 item-not-found:
   - '&cItem with id &f%id%&c could not be found'
 
+# %command% - the command label used
 command-help:
-  - '&a<> &2Item Abilities &a<>'
+  - '&2[Item Abilities] &7Listing commands'
   - ' &a/%command% reclaim &fAttempts to reclaim items'
 
 # %command% - the command label used
 admin-command-help:
-  - '&c<> &4Admin Commands &c<>'
-  - ' &c/%command% give <item_id> [amount] [player_name]'
+  - ' &c/%command% give <player> <item_id> [amount]'
 
 # %item.id%, %item.name%, %amount%, %sender%, %receiver%
 give-item:
+  never-played:
+    - '&c<!> Player &f%player.name% &chas NEVER played'
+    - '&cPlease resend the command to confirm'
+  not-played-since:
+    - '&c<!> Player &f%player.name% &chas not played since &f%last-played%'
+    - '&cPlease resend the command to confirm'
   admin:
     - '&aGave %amount%x %item.id% to %receiver%'
   admin-offline:
     - '&f%receiver%&c is offline!'
     - '&a%amount%x %item.id% has been added to their reclaim'
   player:
-    - '&aYou have been given %amount% %item.name% by %sender%'
+    - '&aYou have been given %amount% %item.name%'
   player-reclaim:
     - '&aYou have been given %amount% %item.name% by %sender%'
     - '&eYou did not have space in your inventory,'
     - '&eso these items have been sent to your reclaim'
-    - '&etype &f/item_ability reclaim &eto reclaim these!'
+    - '&etype &f/ia reclaim &eto reclaim these!'
 
 # %amount.reclaimed%, %amount.remain%, %plural.reclaimed%, %plural.remain%
 reclaim:

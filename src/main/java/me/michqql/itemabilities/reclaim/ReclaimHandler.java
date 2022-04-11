@@ -1,7 +1,7 @@
-package me.michqql.itemabilities.item.reclaim;
+package me.michqql.itemabilities.reclaim;
 
 import me.michqql.core.io.YamlFile;
-import me.michqql.itemabilities.ItemAbilitiesPlugin;
+import me.michqql.itemabilities.ItemAbilityPlugin;
 import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.util.Pair;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -13,18 +13,18 @@ import java.util.*;
 
 public class ReclaimHandler {
 
-    private final ItemAbilitiesPlugin plugin;
+    private final ItemAbilityPlugin plugin;
 
-    public ReclaimHandler(ItemAbilitiesPlugin plugin) {
+    public ReclaimHandler(ItemAbilityPlugin plugin) {
         this.plugin = plugin;
     }
 
     public void giveItem(UUID uuid, String itemId, int amount) {
-            YamlFile yamlFile = new YamlFile(plugin, "reclaim", uuid.toString());
-            FileConfiguration f = yamlFile.getConfig();
-            int savedAmount = f.getInt(itemId, 0);
-            yamlFile.getConfig().set(itemId, amount + savedAmount);
-            yamlFile.save();
+        YamlFile yamlFile = new YamlFile(plugin, "reclaim", uuid.toString());
+        FileConfiguration f = yamlFile.getConfig();
+        int savedAmount = f.getInt(itemId, 0);
+        f.set(itemId, amount + savedAmount);
+        yamlFile.save();
     }
 
     public Pair<String, Integer> getNextItem(UUID uuid) {
@@ -60,7 +60,7 @@ public class ReclaimHandler {
             int amount = f.getInt(itemId, 0);
             if(amount > 0) {
                 f.set(itemId, null);
-                ItemStack item = ItemGenerator.generateItem(plugin, itemId);
+                ItemStack item = ItemGenerator.generateItem(itemId);
                 item.setAmount(amount);
                 inv.addItem(item);
                 reclaimed++;

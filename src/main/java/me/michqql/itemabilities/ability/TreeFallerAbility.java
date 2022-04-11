@@ -1,6 +1,6 @@
 package me.michqql.itemabilities.ability;
 
-import me.michqql.itemabilities.ItemAbilitiesPlugin;
+import me.michqql.itemabilities.ItemAbilityPlugin;
 import me.michqql.itemabilities.ItemAbility;
 import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.item.ItemModifier;
@@ -33,7 +33,7 @@ public class TreeFallerAbility extends ItemAbility {
 
     private final int MAX_BLOCK_UPDATES_PER_TICK = 4;
 
-    public TreeFallerAbility(ItemAbilitiesPlugin plugin) {
+    public TreeFallerAbility(ItemAbilityPlugin plugin) {
         super(plugin, "tree_faller");
     }
 
@@ -52,8 +52,16 @@ public class TreeFallerAbility extends ItemAbility {
 
         e.setCancelled(true);
 
-        ItemModifier.getAndSetPropertyValue(plugin, item.value, "uses", (value) -> --value);
-        ItemGenerator.updateItem(plugin, item.value);
+        ItemModifier.getAndSetPropertyValue(item.value, "uses", (value) -> {
+            int remaining = value.intValue() - 1;
+            if(remaining <= 0) {
+                // break item
+                return null;
+            }
+            System.out.println("Remaining uses: " + remaining);
+            return remaining;
+        });
+        ItemGenerator.updateItem(item.value);
 
         final World world = block.getWorld();
         new BukkitRunnable() {

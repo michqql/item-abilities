@@ -5,7 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.michqql.core.io.JsonFile;
 import me.michqql.core.util.MessageHandler;
-import me.michqql.itemabilities.ItemAbilitiesPlugin;
+import me.michqql.itemabilities.ItemAbilityPlugin;
+import me.michqql.itemabilities.item.data.NumberDataType;
 import me.michqql.itemabilities.util.Tuple;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -21,11 +22,15 @@ import java.util.List;
 
 public class ItemGenerator {
 
-    public static ItemStack generateItem(final ItemAbilitiesPlugin plugin, final String itemId) {
-        return generateItem(plugin, new JsonFile(plugin, "items", itemId));
+    private final static ItemAbilityPlugin PLUGIN = ItemAbilityPlugin.getInstance();
+    public final static String ITEM_ID_KEY = "item-id";
+    public final static String PROPERTY_ID_KEY = "property-";
+
+    public static ItemStack generateItem(final String itemId) {
+        return generateItem(new JsonFile(PLUGIN, "items", itemId));
     }
 
-    public static ItemStack generateItem(final ItemAbilitiesPlugin plugin, final JsonFile file) {
+    public static ItemStack generateItem(final JsonFile file) {
         JsonElement element = file.getJsonElement();
         if(!element.isJsonObject()) {
             throw new IllegalArgumentException("Could not read json file");
@@ -35,74 +40,64 @@ public class ItemGenerator {
 
         // Contains 3 properties - item_id (string), properties (array of objects), item (object)
         String id = json.get("item_id").getAsString();
-        JsonArray properties = json.getAsJsonArray("properties");
+        JsonArray propertyArray = json.getAsJsonArray("properties");
         JsonObject item = json.getAsJsonObject("item");
 
         // Parse file and create ItemStack first with "item" object
         Tuple<Material, String, List<String>> itemData = readItemObject(item);
         ItemStack itemStack = new ItemStack(itemData.a);
+
         ItemMeta meta = itemStack.getItemMeta();
         if(meta != null) {
             PersistentDataContainer data = meta.getPersistentDataContainer();
-            // Id
-            data.set(new NamespacedKey(plugin, "ia-item-id"), PersistentDataType.STRING, id);
 
-            // Props
+            // Item ID
+            data.set(NKeyCache.getNKey(ITEM_ID_KEY), PersistentDataType.STRING, id);
+
+            // Properties
             HashMap<String, String> propertyPlaceholders = new HashMap<>();
-            for(JsonElement arrayElement : properties) {
+            for(JsonElement arrayElement : propertyArray) {
                 if(!arrayElement.isJsonObject())
                     continue;
 
                 JsonObject object = arrayElement.getAsJsonObject();
                 String tag = object.get("tag").getAsString();
-                int value = object.get("value").getAsInt();
+                Number value = object.get("value").getAsNumber();
 
-                propertyPlaceholders.put(tag, String.valueOf(value));
-                data.set(new NamespacedKey(plugin, "iap-" + tag), PersistentDataType.INTEGER, value);
+                propertyPlaceholders.put(tag, String.valueOf(value.intValue()));
+                data.set(NKeyCache.getNKey(PROPERTY_ID_KEY + tag), NumberDataType.NUMBER, value);
             }
 
-            meta.setDisplayName(MessageHandler.colour(itemData.b));
+            meta.setDisplayName(MessageHandler.replacePlaceholdersStatic(itemData.b, propertyPlaceholders));
             meta.setLore(MessageHandler.replacePlaceholdersStatic(itemData.c, propertyPlaceholders));
             itemStack.setItemMeta(meta);
         }
-
         return itemStack;
     }
 
-    public static void updateItem(final ItemAbilitiesPlugin plugin, final ItemStack toUpdate) {
-        updateItem(new JsonFile(plugin, "items", ItemModifier.getIdOnItem(plugin, toUpdate)), toUpdate);
-    }
-
-    public static void updateItem(final JsonFile file, final ItemStack toUpdate) {
-        JsonElement element = file.getJsonElement();
-        if(!element.isJsonObject()) {
-            throw new IllegalArgumentException("Could not read json file");
-        }
-
-        JsonObject json = element.getAsJsonObject();
-
-        JsonObject item = json.getAsJsonObject("item");
-        Tuple<Material, String, List<String>> itemData = readItemObject(item);
-
-        ItemMeta meta = toUpdate.getItemMeta();
+    public static void updateItem(final ItemStack itemStack) {
+        ItemMeta meta = itemStack.getItemMeta();
         if(meta != null) {
             PersistentDataContainer data = meta.getPersistentDataContainer();
 
-            // Props
+            // Properties
             HashMap<String, String> propertyPlaceholders = new HashMap<>();
-            for(NamespacedKey key : data.getKeys()) {
-                if(!key.getKey().startsWith("iap-"))
+            for(NamespacedKey nkey : data.getKeys()) {
+                String key = nkey.getKey();
+                if(!key.startsWith(PROPERTY_ID_KEY) || key.length() <= PROPERTY_ID_KEY.length())
                     continue;
 
-                String tag = key.getKey().substring(4);
-                Integer value = data.get(key, PersistentDataType.INTEGER);
+                String tag = key.substring(9);
+                System.out.println("Updating property: " + tag);
 
-                propertyPlaceholders.put(tag, String.valueOf(value));
+                Number value = data.get(nkey, NumberDataType.NUMBER);
+                if(value == null)
+                    continue;
+
+                System.out.println("Current value: " + value.intValue());
+                propertyPlaceholders.put(tag, String.valueOf(value.intValue()));
             }
-
-            meta.setDisplayName(MessageHandler.colour(itemData.b));
-            meta.setLore(MessageHandler.replacePlaceholdersStatic(itemData.c, propertyPlaceholders));
-            toUpdate.setItemMeta(meta);
+            itemStack.setItemMeta(meta);
         }
     }
 
@@ -132,6 +127,18 @@ public class ItemGenerator {
         tuple.c = lore;
         return tuple;
     }
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
