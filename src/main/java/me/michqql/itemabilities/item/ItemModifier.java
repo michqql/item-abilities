@@ -2,6 +2,7 @@ package me.michqql.itemabilities.item;
 
 import me.michqql.itemabilities.ItemAbilityPlugin;
 import me.michqql.itemabilities.item.data.NumberDataType;
+import me.michqql.itemabilities.item.item.RealItem;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,6 +15,10 @@ import java.util.function.Function;
 public class ItemModifier {
 
     private final static ItemAbilityPlugin PLUGIN = ItemAbilityPlugin.getInstance();
+
+    public static RealItem getItemData(final ItemStack itemStack) {
+        return new RealItem(itemStack);
+    }
 
     public static String getIdOnItem(final ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();

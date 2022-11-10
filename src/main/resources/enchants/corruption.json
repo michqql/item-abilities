@@ -1,0 +1,9 @@
+{
+  "enchantment_name": "Corruption",
+  "display_colour": "&7",
+  "max_level": 3,
+  "settings": {
+    "corruption_threshold": 10,
+    "minimum_damage": 10.0
+  }
+}

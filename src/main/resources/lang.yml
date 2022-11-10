@@ -21,6 +21,9 @@ invalid-command:
 item-not-found:
   - '&cItem with id &f%id%&c could not be found'
 
+enchant-not-found:
+  - '&cEnchant with id &f%id%&c could not be found'
+
 # %command% - the command label used
 command-help:
   - '&2[Item Abilities] &7Listing commands'
@@ -50,6 +53,22 @@ give-item:
     - '&eYou did not have space in your inventory,'
     - '&eso these items have been sent to your reclaim'
     - '&etype &f/ia reclaim &eto reclaim these!'
+
+enchant-item:
+  list-enchants:
+    title:
+      - '&2Listing custom enchantments'
+    body:
+      - '&a- %id% &f%name%'
+
+  must-hold-item:
+    - '&cYou must be holding the item in your main hand'
+
+  item-cannot-be-enchanted:
+    - '&cThe item you are currently holding cannot be enchanted'
+
+  enchanted:
+    - '&aSuccessfully enchanted item &f%item% &awith &7%enchantment% %level%'
 
 # %amount.reclaimed%, %amount.remain%, %plural.reclaimed%, %plural.remain%
 reclaim:

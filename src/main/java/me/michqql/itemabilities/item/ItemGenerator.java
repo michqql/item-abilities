@@ -6,25 +6,47 @@ import com.google.gson.JsonObject;
 import me.michqql.core.io.JsonFile;
 import me.michqql.core.util.MessageHandler;
 import me.michqql.itemabilities.ItemAbilityPlugin;
+import me.michqql.itemabilities.item.data.BooleanDataType;
 import me.michqql.itemabilities.item.data.NumberDataType;
+import me.michqql.itemabilities.item.data.UUIDDataType;
 import me.michqql.itemabilities.util.Tuple;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class ItemGenerator {
 
     private final static ItemAbilityPlugin PLUGIN = ItemAbilityPlugin.getInstance();
+
+    // Namespace Key ID's
+    public final static String TRACKER_ID_KEY = "tracker-uuid";
     public final static String ITEM_ID_KEY = "item-id";
     public final static String PROPERTY_ID_KEY = "property-";
+    public final static String EXAMPLE_KEY = "example";
+    public final static String ENCHANTABLE_KEY = "enchantable";
+    public final static String ENCHANTMENT_ID_KEY = "enchant-";
+    public final static String REFORGABLE_KEY = "enchantable";
+
+    // Json keys
+    private final static String ITEM_ID_JSON_KEY = "item_id";
+    private final static String PROPERTY_JSON_KEY = "properties";
+    private final static String PROPERTY_TAG_JSON_KEY = "tag";
+    private final static String PROPERTY_VALUE_JSON_KEY = "value";
+    private final static String ENCHANTABLE_JSON_KEY = "enchantable";
+    private final static String REFORGABLE_JSON_KEY = "reforgable";
+    private final static String ITEM_JSON_KEY = "item";
+    private final static String ITEM_FLAG_JSON_KEY = "item_flags";
+
+    protected static UUID TRACKER_UUID = UUID.randomUUID();
 
     public static ItemStack generateItem(final String itemId) {
         return generateItem(new JsonFile(PLUGIN, "items", itemId));
@@ -39,9 +61,9 @@ public class ItemGenerator {
         JsonObject json = element.getAsJsonObject();
 
         // Contains 3 properties - item_id (string), properties (array of objects), item (object)
-        String id = json.get("item_id").getAsString();
-        JsonArray propertyArray = json.getAsJsonArray("properties");
-        JsonObject item = json.getAsJsonObject("item");
+        final String id = json.get(ITEM_ID_JSON_KEY).getAsString();
+        JsonArray propertyArray = json.getAsJsonArray(PROPERTY_JSON_KEY);
+        JsonObject item = json.getAsJsonObject(ITEM_JSON_KEY);
 
         // Parse file and create ItemStack first with "item" object
         Tuple<Material, String, List<String>> itemData = readItemObject(item);
@@ -51,54 +73,61 @@ public class ItemGenerator {
         if(meta != null) {
             PersistentDataContainer data = meta.getPersistentDataContainer();
 
+            // UUID
+            UUID uuid = new UUID(UUID.randomUUID().getMostSignificantBits(), TRACKER_UUID.getLeastSignificantBits());
+            while(ItemUUIDTracker.isUUIDRegistered(uuid)) { // ensure uuid is not a duplicate
+                uuid = new UUID(UUID.randomUUID().getMostSignificantBits(), TRACKER_UUID.getLeastSignificantBits());
+            }
+            data.set(NKeyCache.getNKey(TRACKER_ID_KEY), UUIDDataType.UUID, uuid);
+            ItemUUIDTracker.registerNewUUID(uuid, id);
+
             // Item ID
             data.set(NKeyCache.getNKey(ITEM_ID_KEY), PersistentDataType.STRING, id);
 
             // Properties
-            HashMap<String, String> propertyPlaceholders = new HashMap<>();
             for(JsonElement arrayElement : propertyArray) {
                 if(!arrayElement.isJsonObject())
                     continue;
 
                 JsonObject object = arrayElement.getAsJsonObject();
-                String tag = object.get("tag").getAsString();
-                Number value = object.get("value").getAsNumber();
+                String tag = object.get(PROPERTY_TAG_JSON_KEY).getAsString();
+                Number value = object.get(PROPERTY_VALUE_JSON_KEY).getAsNumber();
 
-                propertyPlaceholders.put(tag, String.valueOf(value.intValue()));
                 data.set(NKeyCache.getNKey(PROPERTY_ID_KEY + tag), NumberDataType.NUMBER, value);
             }
 
-            meta.setDisplayName(MessageHandler.replacePlaceholdersStatic(itemData.b, propertyPlaceholders));
-            meta.setLore(MessageHandler.replacePlaceholdersStatic(itemData.c, propertyPlaceholders));
+            meta.setDisplayName(MessageHandler.colour(itemData.b));
+            meta.setLore(MessageHandler.colour(itemData.c));
+
+            // Enchants and reforges
+            if(json.has(ENCHANTABLE_JSON_KEY) && json.get(ENCHANTABLE_JSON_KEY).getAsBoolean()) {
+                data.set(NKeyCache.getNKey(ENCHANTABLE_KEY), BooleanDataType.BOOLEAN, true);
+            }
+
+            if(json.has(REFORGABLE_JSON_KEY) && json.get(REFORGABLE_JSON_KEY).getAsBoolean()) {
+                data.set(NKeyCache.getNKey(REFORGABLE_KEY), BooleanDataType.BOOLEAN, true);
+            }
+
+            // Item flags
+            if(item.has(ITEM_FLAG_JSON_KEY)) {
+                JsonArray flagArray = item.get(ITEM_FLAG_JSON_KEY).getAsJsonArray();
+                for (JsonElement flagElement : flagArray) {
+                    if (!flagElement.isJsonPrimitive())
+                        continue;
+
+                    String string = flagElement.getAsString();
+                    ItemFlag flag;
+                    try {
+                        flag = ItemFlag.valueOf(string);
+                        meta.addItemFlags(flag);
+                    } catch (IllegalArgumentException ignore) {
+                    }
+                }
+            }
+
             itemStack.setItemMeta(meta);
         }
         return itemStack;
-    }
-
-    public static void updateItem(final ItemStack itemStack) {
-        ItemMeta meta = itemStack.getItemMeta();
-        if(meta != null) {
-            PersistentDataContainer data = meta.getPersistentDataContainer();
-
-            // Properties
-            HashMap<String, String> propertyPlaceholders = new HashMap<>();
-            for(NamespacedKey nkey : data.getKeys()) {
-                String key = nkey.getKey();
-                if(!key.startsWith(PROPERTY_ID_KEY) || key.length() <= PROPERTY_ID_KEY.length())
-                    continue;
-
-                String tag = key.substring(9);
-                System.out.println("Updating property: " + tag);
-
-                Number value = data.get(nkey, NumberDataType.NUMBER);
-                if(value == null)
-                    continue;
-
-                System.out.println("Current value: " + value.intValue());
-                propertyPlaceholders.put(tag, String.valueOf(value.intValue()));
-            }
-            itemStack.setItemMeta(meta);
-        }
     }
 
     private static Tuple<Material, String, List<String>> readItemObject(final JsonObject object) {
@@ -127,18 +156,13 @@ public class ItemGenerator {
         tuple.c = lore;
         return tuple;
     }
+
+    /**
+     * Used for security purposes to track the owner of an item
+     * If set to null, a random UUID will be used.
+     * @param uuid the tracker uuid
+     */
+    public static void setTrackerUUID(UUID uuid) {
+        TRACKER_UUID = Objects.requireNonNullElseGet(uuid, UUID::randomUUID);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

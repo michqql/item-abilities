@@ -6,12 +6,23 @@
       "value": 100
     }
   ],
+  "enchantable": false,
+  "reforgable": false,
   "item": {
     "name": "&6Grappling Hook",
     "material": "FISHING_ROD",
     "lore": [
       "&eRight-Click &7to cast and reel your grapple",
       "&7Uses remaining: &f%uses%"
+    ],
+    "item_flags": [
+      "HIDE_ENCHANTS",
+      "HIDE_ATTRIBUTES",
+      "HIDE_UNBREAKABLE",
+      "HIDE_DESTROYS",
+      "HIDE_PLACED_ON",
+      "HIDE_POTION_EFFECTS",
+      "HIDE_DYE"
     ]
   }
 }

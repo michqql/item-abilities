@@ -3,6 +3,9 @@ version: ${project.version}
 main: me.michqql.itemabilities.ItemAbilityPlugin
 api-version: 1.18
 
+depend:
+  - 'ProtocolLib'
+
 commands:
   itemAbility:
     aliases: ['ia']

@@ -1,9 +1,12 @@
 package me.michqql.itemabilities.commands;
 
+import me.michqql.core.gui.GuiHandler;
 import me.michqql.core.util.MessageHandler;
 import me.michqql.core.util.Placeholder;
 import me.michqql.itemabilities.ItemAbilityPlugin;
+import me.michqql.itemabilities.commands.admin.EnchantSubCommand;
 import me.michqql.itemabilities.commands.admin.GiveSubCommand;
+import me.michqql.itemabilities.commands.admin.ViewItemSubCommand;
 import me.michqql.itemabilities.commands.player.ReclaimSubCommand;
 import me.michqql.itemabilities.reclaim.ReclaimHandler;
 import org.bukkit.command.Command;
@@ -20,14 +23,17 @@ public class ItemAbilityCommand implements CommandExecutor, TabExecutor {
 
     private final ItemAbilityPlugin plugin;
     private final MessageHandler messageHandler;
+    private final GuiHandler guiHandler;
 
     private final ReclaimHandler reclaimHandler;
 
     private final List<SubCommand> registeredSubCommands = new ArrayList<>();
 
-    public ItemAbilityCommand(ItemAbilityPlugin plugin, MessageHandler messageHandler, ReclaimHandler reclaimHandler) {
+    public ItemAbilityCommand(ItemAbilityPlugin plugin, MessageHandler messageHandler,
+                              GuiHandler guiHandler, ReclaimHandler reclaimHandler) {
         this.plugin = plugin;
         this.messageHandler = messageHandler;
+        this.guiHandler = guiHandler;
         this.reclaimHandler = reclaimHandler;
         registerSubCommands();
     }
@@ -36,6 +42,8 @@ public class ItemAbilityCommand implements CommandExecutor, TabExecutor {
         registeredSubCommands.addAll(Arrays.asList(
                 // Admin commands
                 new GiveSubCommand(plugin, messageHandler, reclaimHandler),
+                new ViewItemSubCommand(plugin, messageHandler, guiHandler),
+                new EnchantSubCommand(plugin, messageHandler),
 
                 // Player commands
                 new ReclaimSubCommand(plugin, messageHandler, reclaimHandler)
@@ -207,9 +215,25 @@ public class ItemAbilityCommand implements CommandExecutor, TabExecutor {
         boolean isPlayer = sender instanceof Player;
 
         // Get the sub command
-        SubCommand subCommand = getSubCommand(args[0]);
+        String input = args[0];
+        SubCommand subCommand = getSubCommand(input);
         if(subCommand == null) {
-            return null;
+            // No sub command match, suggest sub commands
+            List<String> result = new ArrayList<>();
+            for(SubCommand sub : registeredSubCommands) {
+                if(sub.getName().startsWith(input))
+                    result.add(sub.getName());
+
+                List<String> aliases = sub.getAliases();
+                if(aliases == null || aliases.isEmpty())
+                    continue;
+
+                for(String alias : aliases) {
+                    if(alias.startsWith(input))
+                        result.add(alias);
+                }
+            }
+            return result;
         }
 
         // Copy the array, removing the sub command string (the first index)

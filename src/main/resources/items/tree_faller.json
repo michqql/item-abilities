@@ -6,12 +6,17 @@
       "value": 100
     }
   ],
+  "enchantable": true,
+  "reforgable": true,
   "item": {
     "name": "&6Tree Faller",
     "material": "IRON_AXE",
     "lore": [
       "&eChop Trees &7to mine them instantly!",
       "&7Uses remaining: &f%uses%"
+    ],
+    "item_flags": [
+      "HIDE_ATTRIBUTES"
     ]
   }
 }

@@ -26,7 +26,7 @@ public class GiveSubCommand extends SubCommand {
     private final static UUID CONSOLE_UUID = UUID.randomUUID();
     private final static long ONE_MONTH = TimeUnit.DAYS.toMillis(30);
     private final Cache<UUID, UUID> senderToReceiverCache = CacheBuilder.newBuilder()
-            .maximumSize(50).expireAfterWrite(1, TimeUnit.MINUTES).build();
+            .expireAfterWrite(1, TimeUnit.MINUTES).build();
 
     private final ReclaimHandler reclaimHandler;
 
@@ -88,6 +88,8 @@ public class GiveSubCommand extends SubCommand {
         // Get item
         ItemStack item;
         try {
+            // Set the tracking uuid
+            ItemGenerator.setTrackerUUID(player.getUniqueId());
             item = ItemGenerator.generateItem(itemId);
         } catch(IllegalArgumentException e) {
             messageHandler.sendList(sender, "item-not-found", new HashMap<>() {{

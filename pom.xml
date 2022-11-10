@@ -61,13 +61,19 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+
+        <!-- ProtocolLib repo -->
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.18.1-R0.1-SNAPSHOT</version>
+            <version>1.19.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -75,6 +81,21 @@
             <groupId>me.michqql</groupId>
             <artifactId>core</artifactId>
             <version>1.6</version>
+        </dependency>
+
+        <!-- ProtocolLib -->
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.8.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Roman Numeral Parser: https://github.com/fracpete/romannumerals4j -->
+        <dependency>
+            <groupId>com.github.fracpete</groupId>
+            <artifactId>romannumerals4j</artifactId>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 </project>

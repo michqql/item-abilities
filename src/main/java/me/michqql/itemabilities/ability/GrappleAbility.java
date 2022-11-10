@@ -2,7 +2,6 @@ package me.michqql.itemabilities.ability;
 
 import me.michqql.itemabilities.ItemAbilityPlugin;
 import me.michqql.itemabilities.ItemAbility;
-import me.michqql.itemabilities.item.ItemGenerator;
 import me.michqql.itemabilities.item.ItemModifier;
 import me.michqql.itemabilities.util.Pair;
 import org.bukkit.Location;
@@ -39,12 +38,10 @@ public class GrappleAbility extends ItemAbility {
             int remaining = value.intValue() - 1;
             if(remaining <= 0) {
                 // break item
-                return null;
+                return remaining;
             }
-            System.out.println("Remaining uses: " + remaining);
             return remaining;
         });
-        ItemGenerator.updateItem(item.value);
 
         Location hook = e.getHook().getLocation().clone();
         //hook.setY(inverseLerp(0, 255, hook.getY()) - 1); // trying to normalize y-value

@@ -13,6 +13,13 @@ import java.util.UUID;
 
 public class CommandUtil {
 
+    public static boolean hasFlag(String[] args, int index, String flag) {
+        if(index < 0 || index >= args.length)
+            return false;
+
+        return args[index].equals(flag);
+    }
+
     public static int parseInt(String[] args, int index, int def) {
         if(index < 0 || args.length < index + 1)
             return def;

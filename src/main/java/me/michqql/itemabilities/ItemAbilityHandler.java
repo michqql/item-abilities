@@ -15,7 +15,7 @@ public class ItemAbilityHandler {
         HandlerList.unregisterAll(ability);
         ITEM_ABILITIES.put(ability.getIdentifier(), ability);
         Bukkit.getPluginManager().registerEvents(ability, ability.plugin);
-        Bukkit.getLogger().log(Level.INFO, "Registered item ability: " + ability.getIdentifier());
+        ItemAbilityPlugin.getLog().info("Registered item ability " + ability.getIdentifier());
     }
 
     public static ItemAbility getAbility(String id) {

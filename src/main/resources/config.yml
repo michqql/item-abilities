@@ -1,0 +1,14 @@
+# 𝐈𝐭𝐞𝐦 𝐓𝐫𝐚𝐜𝐤𝐢𝐧𝐠
+item-tracker:
+  # How often should the item tracker save the tracked entries
+  auto-save-time-seconds: 3600 # 5 minutes
+  # If the auto saving is causing a lag spike, set the limited updater to > 0
+  # This controls how many entries are saved per auto save
+  # A lower number means more RAM usage, a higher number means more entries saved per auto save
+  # Recommended being in the hundreds-thousands range
+  limited-updating: 0
+
+  # Should staff be warned about possible duping?
+  warn-staff-about-dupes:
+    enabled: true
+    permission: 'ia.admin' # The permission staff need to receive the warning
